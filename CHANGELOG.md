@@ -1,5 +1,29 @@
 # CHANGELOG
 
+### v1.0.3
+
+- Updated to latest major versions of all dependencies
+
+### v1.0.2
+
+- Updated to latest version of all dependencies
+
+### v1.0.1
+
+- Fixed operation message type for resolver error in `Query/Mutation` operations.
+- Updated dependencies and scala version.
+
+## v1.0.0
+
+Websocket transport feature complete with unit tests and major bug fixes, published with scala compiler version.
+
+### v0.2.3
+
+- Fixed issue with invalid `type` on incoming messages to terminate the connection.
+- Removed deprecated, unused code.
+- Made `GqlError` into proper case class.
+- Renamed `Route` middleware directives to `applyMiddleware` from `ws`.
+
 ### v0.2.2
 
 - Fixed issue with sub-protocol error message to be user understandable.

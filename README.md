@@ -1,17 +1,17 @@
 <p align="center">
-<img src="./over-layer.png" width="175" alt="logo" style="margin:1rem;"/>
+<img src="https://github.com/d-exclaimation/over-layer/blob/main/over-layer.png" width="175" alt="logo" style="margin:1rem;"/>
 </p>
 <p align="center"> <h1>OverLayer</h1></p>
 
 
-A GraphQL over Websocket Stream-based Subscription Transport Layer on Akka.
+A GraphQL over Websocket Stream-based Transport Layer on Akka.
 
 ## Setup
 
-**Latest Version**: `0.2.2`
+**Latest Version**: `1.0.3`
 
 ```sbt
-"io.github.d-exclaimation" % "over-layer" % latestVersion
+"io.github.d-exclaimation" %% "over-layer" % latestVersion
 ```
 
 ## GraphQL Over Websockets
@@ -20,7 +20,7 @@ In the GraphQL world, we have the concept of a "subscription" which is a request
 of data that is sent from the server. This is usually done using websocket with a additional subprotocol.
 
 This package is a websocket transport layer for managing, encoding, and
-decoding [Sangria](https://github.com/sangria-graphql/sangria-akka-streams) stream based subscription into the proper
+decoding [Sangria](https://github.com/sangria-graphql/sangria-akka-streams) stream based operations into the proper
 sub-protocol format using Akka Actors.
 
 ## Usage/Examples

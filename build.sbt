@@ -1,11 +1,12 @@
 
 // The simplest possible sbt build file is just one line:
 
-scalaVersion := "2.13.3"
+scalaVersion := "2.13.6"
 
-ThisBuild / name := "over-layer"
+name := "over-layer"
+
 ThisBuild / organization := "io.github.d-exclaimation"
-ThisBuild / version := "0.2.2"
+ThisBuild / version := "1.0.3"
 ThisBuild / organizationHomepage := Some(url("https://www.dexclaimation.com"))
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -23,9 +24,9 @@ ThisBuild / developers := List(
   )
 )
 
-crossPaths := false
+// crossPaths := false
 
-ThisBuild / description := "A GraphQL over Websocket Stream-based Subscription Transport Layer on Akka."
+ThisBuild / description := "A GraphQL over Websocket Stream-based Transport Layer on Akka."
 ThisBuild / licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 ThisBuild / homepage := Some(url("https://overlayer.netlify.app"))
 
@@ -43,9 +44,9 @@ ThisBuild / publishMavenStyle := true
 ThisBuild / versionScheme := Some("early-semver")
 
 libraryDependencies ++= {
-  val sangriaVer = "2.1.3"
-  val AkkaVersion = "2.6.16"
-  val AkkaHttpVersion = "10.2.6"
+  val sangriaVer = "3.0.0"
+  val AkkaVersion = "2.6.18"
+  val AkkaHttpVersion = "10.2.9"
   Seq(
     "org.sangria-graphql" %% "sangria" % sangriaVer,
     "org.sangria-graphql" %% "sangria-spray-json" % "1.0.2",

@@ -26,7 +26,6 @@ import io.github.dexclaimation.overlayer.model.Hooks._
 import io.github.dexclaimation.overlayer.model.Subtypes.{PID, Ref}
 import io.github.dexclaimation.overlayer.model.{PoisonPill, SchemaConfig}
 import io.github.dexclaimation.overlayer.protocol.OverWebsocket
-import io.github.dexclaimation.overlayer.protocol.common.GraphMessage._
 import io.github.dexclaimation.overlayer.protocol.common.{GqlError, GraphMessage, OperationMessage}
 import sangria.execution.deferred.DeferredResolver
 import sangria.execution.{DeprecationTracker, ExceptionHandler, Middleware, QueryReducer}
@@ -64,6 +63,17 @@ class OverTransportLayer[Ctx, Val](
     name = s"OverEngine-${PID()}",
   )
 
+
+  /**
+   * Websocket route with the proper sub protocol and flow.
+   *
+   * ''Does not include a path, add this inside your path directives''
+   *
+   * @param ctx Context object used in the request.
+   * @return A Route
+   */
+  def applyMiddleware(ctx: Ctx): Route = handleWebSocketMessagesForProtocol(flow(ctx), protocol.name)
+
   /**
    * Websocket Handler Shorthand with the proper sub protocol and flow.
    *
@@ -72,6 +82,7 @@ class OverTransportLayer[Ctx, Val](
    * @param ctx Context object used in the request.
    * @return A Route
    */
+  @deprecated("use 'applyMiddleware' instead")
   def ws(ctx: Ctx): Route = handleWebSocketMessagesForProtocol(flow(ctx), protocol.name)
 
   /**
@@ -118,25 +129,31 @@ class OverTransportLayer[Ctx, Val](
   /** onMessage Hook */
   private def onMessage(ctx: Any, pid: String, ref: Ref): MessageHook = {
     case TextMessage.Strict(msg) => JsonParser(msg).convertTo[GraphMessage] match {
-      case GraphInit() => onInit(pid, ref)
+      case GraphMessage.Init() => onInit(pid, ref)
 
-      case GraphStart(oid, ast, op, vars) => engine ! StartOp(pid, oid, ast, ctx, op, vars)
+      case GraphMessage.Start(oid, ast, op, vars) => engine ! StartOp(pid, oid, ast, ctx, op, vars)
 
-      case GraphImmediate(oid, ast, op, vars) => engine ! StatelessOp(pid, oid, ast, ctx, op, vars)
+      case GraphMessage.Req(oid, ast, op, vars) => engine ! StatelessOp(pid, oid, ast, ctx, op, vars)
 
-      case GraphStop(oid) => engine ! StopOp(pid, oid)
+      case GraphMessage.Stop(oid) => engine ! StopOp(pid, oid)
 
-      case GraphError(oid, message) => ref <~ OperationMessage(protocol.error, oid, GqlError.of(message))
+      case GraphMessage.Error(oid, message) => ref <~ OperationMessage(protocol.error, oid, GqlError.of(message))
 
-      case GraphException(message) => ref <~ OperationMessage(protocol.error, "4400", GqlError.of(message))
+      case GraphMessage.Exception(message) => onTerminated(message, ref)
 
-      case GraphPing() => ref <~ OperationMessage.just("pong")
+      case GraphMessage.Ping() => ref <~ OperationMessage.just("pong")
 
-      case GraphTerminate() => ref ! PoisonPill()
+      case GraphMessage.Terminate() => ref ! PoisonPill()
 
-      case GraphIgnore() => ()
+      case GraphMessage.Ignore() => ()
     }
     case _ => ()
+  }
+
+  /** onTerminated Hook */
+  private def onTerminated(message: String, ref: Ref): TerminateHook = {
+    ref <~ OperationMessage(protocol.error, "4400", GqlError.of(message))
+    ref ! PoisonPill()
   }
 
   /** onEnd Hook */
